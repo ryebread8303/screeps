@@ -1,20 +1,27 @@
+/*var utility = require('utility');*/
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 
 module.exports.loop = function () {
+    function countRole(role) {
+        var creepsRole = _.filter(Game.creeps, (creep) => creep.memory.role == role);
+        Memory[ role ] = creepsRole.length;
+    };
 
+// garbage collection
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
     }
-    
-    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    console.log('Harvesters: ' + harvesters.length);
+    // autospawn
+    for (var role in ['harvester']){
+        countRole(role);
+    }
 
-    if(harvesters.length < 2) {
+    if(Memory.harvesters.length < 2) {
         var newName = 'Harvester' + Game.time;
         console.log('Spawning new harvester: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
@@ -29,7 +36,7 @@ module.exports.loop = function () {
             Game.spawns['Spawn1'].pos.y,
             {align: 'left', opacity: 0.8});
     }
-    
+// tower behavior
     var tower = Game.getObjectById('514806a6eb1de3ca0d7308a9');
     if(tower) {
         var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -44,7 +51,7 @@ module.exports.loop = function () {
             tower.attack(closestHostile);
         }
     }
-
+// creep behavior
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
         if(creep.memory.role == 'harvester') {
