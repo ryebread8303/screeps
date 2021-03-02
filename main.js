@@ -2,30 +2,39 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
-
 module.exports.loop = function () {
+    let rolesList = ['harvester','builder','upgrader'];
+    // garbage collection
+        for(var name in Memory.creeps) {
+            if(!Game.creeps[name]) {
+                delete Memory.creeps[name];
+                console.log('Clearing non-existing creep memory:', name);
+            }
+        }
+        for(var role of rolesList) {
+            //console.log('Clearing old role count for:', role);
+            delete Memory[ role ];
+        }
+    //utility functions
     function countRole(role) {
         var creepsRole = _.filter(Game.creeps, (creep) => creep.memory.role == role);
         Memory[ role ] = creepsRole.length;
-    };
-
-// garbage collection
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
     }
+
     // autospawn
-    for (var role in ['harvester']){
+    for (var role of rolesList){
         countRole(role);
     }
 
-    if(Memory.harvesters.length < 2) {
+    if(Memory.harvester < 2) {
         var newName = 'Harvester' + Game.time;
-        console.log('Spawning new harvester: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
             {memory: {role: 'harvester'}});
+    }
+    else if (Memory.upgrader < 1) {
+        var newName = 'Upgrader' + Game.time;
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
+            {memory: {role: 'upgrader'}});
     }
 
     if(Game.spawns['Spawn1'].spawning) {
