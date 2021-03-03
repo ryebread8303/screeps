@@ -72,7 +72,7 @@ module.exports.loop = function () {
         var creep = Game.creeps[name];
         if(creep.memory.role == 'harvester') {
             if (spawnFreespace == 0) {
-                roleUpgrader.run(creep);
+                roleBuilder.run(creep);
             }else {
                 roleHarvester.run(creep);
             }
