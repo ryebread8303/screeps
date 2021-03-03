@@ -28,13 +28,18 @@ module.exports.loop = function () {
 
     if(Memory.harvester < 2) {
         var newName = 'Harvester' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE,MOVE], newName,
             {memory: {role: 'harvester'}});
     }
     else if (Memory.upgrader < 2) {
         var newName = 'Upgrader' + Game.time;
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
             {memory: {role: 'upgrader'}});
+    }
+    else if (Memory.builder < 2) {
+        var newName = 'Builder' + Game.time;
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,MOVE], newName,
+            {memory: {role: 'builder'}});
     }
 
     if(Game.spawns['Spawn1'].spawning) {
@@ -61,10 +66,16 @@ module.exports.loop = function () {
         }
     }
 // creep behavior
+    //check for spawner energy count, let harvesters act as upgraders if it's full
+    var spawnFreespace = Game.spawns['Spawn1'].store.getFreeCapacity('energy');
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
         if(creep.memory.role == 'harvester') {
-            roleHarvester.run(creep);
+            if (spawnFreespace == 0) {
+                roleUpgrader.run(creep);
+            }else {
+                roleHarvester.run(creep);
+            }
         }
         if(creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
