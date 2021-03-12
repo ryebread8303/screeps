@@ -2,7 +2,9 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var roomManager = require('roommanager');
 module.exports.loop = function () {
+    roomManager.run(Game.rooms['sim']);
     let rolesList = ['harvester','builder','upgrader'];
     // garbage collection
         for(var name in Memory.creeps) {
@@ -22,23 +24,25 @@ module.exports.loop = function () {
     }
 
     // autospawn
+    var creepCount = Object.keys(Game.creeps).length;
+    Memory['creepsCount'] = creepCount;
     for (var role of rolesList){
         countRole(role);
     }
 
-    if(Memory.harvester < 2) {
+    if(Memory.harvester / creepCount < .5) {
         var newName = 'Harvester' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
             {memory: {role: 'harvester'}});
     }
-    else if (Memory.upgrader < 2) {
+    else if (Memory.upgrader / creepCount < .1) {
         var newName = 'Upgrader' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
             {memory: {role: 'upgrader'}});
     }
-    else if (Memory.builder < 2) {
+    else if (Memory.builder /creepCount < .4) {
         var newName = 'Builder' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
             {memory: {role: 'builder'}});
     }
 
