@@ -7,6 +7,10 @@ var roomManager = require('roommanager');
 module.exports.loop = function () {
     roomManager.run(Game.rooms['sim']);
     let rolesList = ['harvester','builder','upgrader'];
+    var bodies = {};
+    bodies.starter = [WORK,CARRY,MOVE,MOVE];
+    bodies.worker = [WORK,WORK,CARRY,MOVE];
+    bodies.harvester = [WORK,CARRY,CARRY,MOVE,MOVE];
     // garbage collection
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
@@ -33,17 +37,17 @@ module.exports.loop = function () {
 
     if(Memory.harvester / creepCount < .5) {
         var newName = 'Harvester' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep(bodies.harvester, newName,
             {memory: {role: 'harvester'}});
     }
     else if (Memory.upgrader / creepCount < .1) {
         var newName = 'Upgrader' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep(bodies.harvester, newName,
             {memory: {role: 'upgrader'}});
     }
     else if (Memory.builder /creepCount < .4) {
         var newName = 'Builder' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep(bodies.harvester, newName,
             {memory: {role: 'builder'}});
     }
 
